@@ -24,7 +24,7 @@ export default class MulterGoogleCloudStorage implements multer.StorageEngine {
 
 	private gcsBucket: Bucket;
 	private gcsStorage: Storage;
-	private options: StorageOptions & MulterGoogleCloudStorageOptions;
+	public readonly options: StorageOptions & MulterGoogleCloudStorageOptions;
 	//private blobFile: {destination?: string, filename: string} = { destination: '', filename: '' };
 		
 	getFilename( req, file, cb ) {
@@ -32,7 +32,7 @@ export default class MulterGoogleCloudStorage implements multer.StorageEngine {
             const filename: string = path.parse(file.originalname).name.replace(/\s/g, "");
             const extension: string = path.parse(file.originalname).ext;
 
-            cb(null, `$${filename}_${uuid()}${extension}`);
+            cb(null, `${filename}_${uuid()}${extension}`);
         }
 		else
 			cb( null, `${uuid()}` );

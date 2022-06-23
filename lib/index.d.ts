@@ -13,7 +13,7 @@ export declare type MulterGoogleCloudStorageOptions = {
 export default class MulterGoogleCloudStorage implements multer.StorageEngine {
     private gcsBucket;
     private gcsStorage;
-    private options;
+    readonly options: StorageOptions & MulterGoogleCloudStorageOptions;
     getFilename(req: any, file: any, cb: any): void;
     getDestination(req: any, file: any, cb: any): void;
     getContentType(req: any, file: any): any;
