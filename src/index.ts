@@ -1,8 +1,9 @@
 import multer = require('multer');
 import { Bucket, CreateWriteStreamOptions, PredefinedAcl, Storage, StorageOptions } from '@google-cloud/storage';
+import { Request } from 'express';
+import * as path from "path";
 import { v4 as uuid } from 'uuid';
 import urlencode = require('urlencode');
-import { Request } from 'express';
 
 type GoogleCloudBlobFileReference = {
 	destination?: string, 
@@ -27,8 +28,12 @@ export default class MulterGoogleCloudStorage implements multer.StorageEngine {
 	//private blobFile: {destination?: string, filename: string} = { destination: '', filename: '' };
 		
 	getFilename( req, file, cb ) {
-		if(typeof file.originalname === 'string')
-			cb( null, file.originalname );
+		if(typeof file.originalname === 'string') {
+            const filename: string = path.parse(file.originalname).name.replace(/\s/g, "");
+            const extension: string = path.parse(file.originalname).ext;
+
+            cb(null, `$${filename}_${uuid()}${extension}`);
+        }
 		else
 			cb( null, `${uuid()}` );
 	}
@@ -111,18 +116,9 @@ export default class MulterGoogleCloudStorage implements multer.StorageEngine {
 			throw new Error('You have to specify bucket for Google Cloud Storage to work.');
 		}
 
-		if (!opts.projectId) {
-			throw new Error('You have to specify project id for Google Cloud Storage to work.');
-		}
-
-		if (!opts.keyFilename && !opts.credentials) {
-			throw new Error('You have to specify credentials key file or credentials object, for Google Cloud Storage to work.');
-		}
-
 		this.gcsStorage = new Storage({
 			projectId: opts.projectId,
 			keyFilename: opts.keyFilename,
-			credentials: opts.credentials
 		});
 
 		this.gcsBucket = this.gcsStorage.bucket(opts.bucket);
